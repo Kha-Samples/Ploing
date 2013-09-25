@@ -4,9 +4,13 @@
 
 package;
 
+import kha.Color;
+import kha.Configuration;
+import kha.FontStyle;
 import kha.Sprite;
 import kha.Image;
 import kha.Game;
+import kha.LoadingScreen;
 import kha.Painter;
 import kha.Loader;
 import kha.Rectangle;
@@ -53,6 +57,15 @@ class Ploing extends Game {
 		down = false;
 		
 		score = 0;
+	}
+	
+	override public function init(): Void {
+		Configuration.setScreen(new LoadingScreen());
+		Loader.the.loadRoom("level1", initLevel);
+	}
+	
+	private function initLevel(): Void {
+		Configuration.setScreen(this);
 	}
 	
 	// Reset positions and speeds of both pads and the ball
@@ -163,7 +176,7 @@ class Ploing extends Game {
 	}
 	
 	override public function render(painter : Painter) : Void {
-		painter.setColor(255, 255, 255);
+		painter.setColor(Color.fromBytes(255, 255, 255));
 		
 		// Draw pads and ball
 		painter.fillRect(pad1_x, pad1_y, PAD_WIDTH, PAD_HEIGHT);
@@ -171,6 +184,7 @@ class Ploing extends Game {
 		painter.fillRect(ball_x, ball_y, BALL_WIDTH, BALL_HEIGHT);
 		
 		// Draw score at the top left of the screen
+		painter.setFont(Loader.the.loadFont("Arial", new FontStyle(false, false, false), 14));
 		painter.drawString(Std.string(score), 0, 0);
 	}
 	
@@ -179,6 +193,7 @@ class Ploing extends Game {
 		if (button == Button.UP  ) up   = true;
 		if (button == Button.DOWN) down = true;
 	}
+	
 	override public function buttonUp(button: Button): Void {
 		if (button == Button.UP  ) up   = false;
 		if (button == Button.DOWN) down = false;
