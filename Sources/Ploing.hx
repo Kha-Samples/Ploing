@@ -175,7 +175,12 @@ class Ploing extends Game {
 		}
 	}
 	
-	override public function render(painter : Painter) : Void {
+	override public function render(painter: Painter): Void {
+		startRender(painter);
+		
+		painter.setColor(Color.fromBytes(0, 0, 0));
+		painter.fillRect(0, 0, width, height);
+		
 		painter.setColor(Color.fromBytes(255, 255, 255));
 		
 		// Draw pads and ball
@@ -186,6 +191,8 @@ class Ploing extends Game {
 		// Draw score at the top left of the screen
 		painter.setFont(Loader.the.loadFont("Arial", new FontStyle(false, false, false), 14));
 		painter.drawString(Std.string(score), 0, 0);
+		
+		endRender(painter);
 	}
 	
 	// Button control handlers. Update up and down variables
