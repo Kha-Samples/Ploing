@@ -7,11 +7,12 @@ package;
 import kha.Color;
 import kha.Configuration;
 import kha.FontStyle;
+import kha.Framebuffer;
+import kha.Scaler;
 import kha.Sprite;
 import kha.Image;
 import kha.Game;
 import kha.LoadingScreen;
-import kha.Painter;
 import kha.Loader;
 import kha.Rectangle;
 import kha.Button;
@@ -47,6 +48,8 @@ class Ploing extends Game {
 	var up  : Bool;
 	var down: Bool;
 	
+	var backbuffer: Image;
+	
 	// Constructor
 	public function new() {
 		super("Ploing", false);
@@ -60,6 +63,7 @@ class Ploing extends Game {
 	}
 	
 	override public function init(): Void {
+		backbuffer = Image.createRenderTarget(640, 480);
 		Configuration.setScreen(new LoadingScreen());
 		Loader.the.loadRoom("level1", initLevel);
 	}
@@ -175,24 +179,28 @@ class Ploing extends Game {
 		}
 	}
 	
-	override public function render(painter: Painter): Void {
-		startRender(painter);
+	override public function render(frame: Framebuffer): Void {
+		var g = backbuffer.g2;
 		
-		painter.setColor(Color.fromBytes(0, 0, 0));
-		painter.fillRect(0, 0, width, height);
+		g.begin();
 		
-		painter.setColor(Color.fromBytes(255, 255, 255));
+		g.clear();
+		
+		g.color = Color.White;
 		
 		// Draw pads and ball
-		painter.fillRect(pad1_x, pad1_y, PAD_WIDTH, PAD_HEIGHT);
-		painter.fillRect(pad2_x, pad2_y, PAD_WIDTH, PAD_HEIGHT);
-		painter.fillRect(ball_x, ball_y, BALL_WIDTH, BALL_HEIGHT);
+		g.fillRect(pad1_x, pad1_y, PAD_WIDTH, PAD_HEIGHT);
+		g.fillRect(pad2_x, pad2_y, PAD_WIDTH, PAD_HEIGHT);
+		g.fillRect(ball_x, ball_y, BALL_WIDTH, BALL_HEIGHT);
 		
 		// Draw score at the top left of the screen
-		painter.setFont(Loader.the.loadFont("Arial", new FontStyle(false, false, false), 14));
-		painter.drawString(Std.string(score), 0, 0);
+		g.font = Loader.the.loadFont("Arial", new FontStyle(false, false, false), 14);
+		g.drawString(Std.string(score), 0, 0);
+		g.end();
 		
-		endRender(painter);
+		startRender(frame);
+		Scaler.scale(backbuffer, frame, kha.Sys.screenRotation);
+		endRender(frame);
 	}
 	
 	// Button control handlers. Update up and down variables
