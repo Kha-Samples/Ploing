@@ -7,9 +7,10 @@
 	},
 	"assets": [
 		{
-			"type": "blob",
-			"file": "Arial14.kravur",
-			"name": "Arial14.kravur"
+			"type": "font",
+			"file": "arial.ttf",
+			"size": 14,
+			"name": "Arial"
 		}
 	],
 	"rooms": [
