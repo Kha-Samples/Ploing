@@ -4,19 +4,19 @@
 
 package;
 
+import kha.Assets;
 import kha.Color;
-import kha.Configuration;
 import kha.FontStyle;
 import kha.Framebuffer;
+import kha.input.Gamepad;
+import kha.input.Keyboard;
+import kha.Key;
 import kha.Scaler;
 import kha.Image;
-import kha.Game;
-import kha.LoadingScreen;
-import kha.Loader;
-import kha.Rectangle;
-import kha.Button;
+import kha.Scheduler;
+import kha.System;
 
-class Ploing extends Game {
+class Ploing {
 	// Pad sizes and speeds
 	static public var PAD_WIDTH  = 20;
 	static public var PAD_HEIGHT = 80;
@@ -51,28 +51,24 @@ class Ploing extends Game {
 	
 	// Constructor
 	public function new() {
-		super("Ploing", false);
-		
 		resetPositionsAndSpeeds();
 		
 		up   = false;
 		down = false;
 		
 		score = 0;
-	}
-	
-	override public function init(): Void {
+		
 		backbuffer = Image.createRenderTarget(640, 480);
-		Configuration.setScreen(new LoadingScreen());
-		Loader.the.loadRoom("level1", initLevel);
-	}
-	
-	private function initLevel(): Void {
-		Configuration.setScreen(this);
+		Assets.loadEverything(function () {
+			System.notifyOnRender(render);
+			Scheduler.addTimeTask(update, 0, 1 / 60);
+			if (Keyboard.get() != null) Keyboard.get().notify(keyDown, keyUp);
+			if (Gamepad.get() != null) Gamepad.get().notify(axis, null);
+		});
 	}
 	
 	// Reset positions and speeds of both pads and the ball
-	private function resetPositionsAndSpeeds() : Void {
+	private function resetPositionsAndSpeeds(): Void {
 		pad1_x = 0;
 		pad1_y = 240 - PAD_HEIGHT / 2;
 		
@@ -87,14 +83,14 @@ class Ploing extends Game {
 	}
 	
 	// Increase ball speed, but not over a maximum speed
-	private function increaseBallSpeed() : Void {
+	private function increaseBallSpeed(): Void {
 		ball_speed += BALL_SPEED_STEP;
 		if (ball_speed > MAX_BALL_SPEED) ball_speed = MAX_BALL_SPEED;
 	}
 	
 	// Calculate an y speed for when a ball collides with a pad,
 	// based on where both are in comparison to each other.
-	private function getBallYSpeed(pad_mid_y: Float, ball_mid_y: Float) : Float {
+	private function getBallYSpeed(pad_mid_y: Float, ball_mid_y: Float): Float {
 		// If the ball's center is at a lower position compared to
 		// the pad's center, the y speed will be higher, which will
 		// make the ball move faster in the down-direction.
@@ -102,7 +98,7 @@ class Ploing extends Game {
 		return v * 4.0;
 	}
 
-	override public function update() : Void {
+	private function update(): Void {
 		// Move ball
 		ball_x += ball_speedx;
 		ball_y += ball_speedy;
@@ -178,7 +174,7 @@ class Ploing extends Game {
 		}
 	}
 	
-	override public function render(frame: Framebuffer): Void {
+	private function render(frame: Framebuffer): Void {
 		var g = backbuffer.g2;
 		
 		g.begin();
@@ -193,23 +189,52 @@ class Ploing extends Game {
 		g.fillRect(ball_x, ball_y, BALL_WIDTH, BALL_HEIGHT);
 		
 		// Draw score at the top left of the screen
-		g.font = Loader.the.loadFont("Arial", new FontStyle(false, false, false), 14);
+		g.font = Assets.fonts.LiberationSans_Regular;
+		g.fontSize = 14;
 		g.drawString(Std.string(score), 0, 0);
 		g.end();
 		
-		startRender(frame);
-		Scaler.scale(backbuffer, frame, kha.Sys.screenRotation);
-		endRender(frame);
+		frame.g2.begin();
+		Scaler.scale(backbuffer, frame, System.screenRotation);
+		frame.g2.end();
 	}
 	
-	// Button control handlers. Update up and down variables
-	override public function buttonDown(button: Button): Void {
-		if (button == Button.UP  ) up   = true;
-		if (button == Button.DOWN) down = true;
+	// Input handlers. Update up and down variables
+	
+	private function keyDown(key: Key, char: String): Void {
+		switch (key) {
+			case UP:
+				up = true;
+			case DOWN:
+				down = true;
+			default:
+		}
 	}
 	
-	override public function buttonUp(button: Button): Void {
-		if (button == Button.UP  ) up   = false;
-		if (button == Button.DOWN) down = false;
+	private function keyUp(key: Key, char: String): Void {
+		switch (key) {
+			case UP:
+				up = false;
+			case DOWN:
+				down = false;
+			default:
+		}
+	}
+	
+	private function axis(axis: Int, value: Float): Void {
+		if (axis == 1) {
+			if (value > 0.1) {
+				up = true;
+				down = false;
+			}
+			else if (value < -0.1) {
+				down = true;
+				up = false;
+			}
+			else {
+				up = false;
+				down = false;
+			}
+		}
 	}
 }

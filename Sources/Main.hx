@@ -1,10 +1,11 @@
 package;
 
-import kha.Starter;
+import kha.System;
 
 class Main {
 	public static function main() {
-		var starter = new Starter();
-		starter.start(new Ploing());
+		System.init("Ploing", 640, 480, function () {
+			new Ploing();
+		});
 	}
 }
