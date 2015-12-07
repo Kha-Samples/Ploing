@@ -10,6 +10,7 @@ import kha.FontStyle;
 import kha.Framebuffer;
 import kha.input.Gamepad;
 import kha.input.Keyboard;
+import kha.input.Mouse;
 import kha.Key;
 import kha.Scaler;
 import kha.Image;
@@ -64,6 +65,7 @@ class Ploing {
 			Scheduler.addTimeTask(update, 0, 1 / 60);
 			if (Keyboard.get() != null) Keyboard.get().notify(keyDown, keyUp);
 			if (Gamepad.get() != null) Gamepad.get().notify(axis, null);
+			if (Mouse.get() != null) Mouse.get().notify(null, null, mouseMove, null);
 		});
 	}
 	
@@ -236,5 +238,9 @@ class Ploing {
 				down = false;
 			}
 		}
+	}
+	
+	private function mouseMove(x: Int, y: Int, movementX: Int, movementY: Int): Void {
+		pad1_y = y / System.pixelHeight * backbuffer.height - PAD_HEIGHT / 2;
 	}
 }
