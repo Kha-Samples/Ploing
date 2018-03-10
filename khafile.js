@@ -1,7 +1,7 @@
-var project = new Project('Ploing');
+let project = new Project('Ploing');
 
 project.addAssets('Assets/**');
 
 project.addSources('Sources');
 
-return project;
+resolve(project);

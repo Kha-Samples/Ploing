@@ -11,7 +11,7 @@ import kha.Framebuffer;
 import kha.input.Gamepad;
 import kha.input.Keyboard;
 import kha.input.Mouse;
-import kha.Key;
+import kha.input.KeyCode;
 import kha.Scaler;
 import kha.Image;
 import kha.Scheduler;
@@ -203,21 +203,21 @@ class Ploing {
 	
 	// Input handlers. Update up and down variables
 	
-	private function keyDown(key: Key, char: String): Void {
+	private function keyDown(key: KeyCode): Void {
 		switch (key) {
-			case UP:
+			case Up:
 				up = true;
-			case DOWN:
+			case Down:
 				down = true;
 			default:
 		}
 	}
 	
-	private function keyUp(key: Key, char: String): Void {
+	private function keyUp(key: KeyCode): Void {
 		switch (key) {
-			case UP:
+			case Up:
 				up = false;
-			case DOWN:
+			case Down:
 				down = false;
 			default:
 		}
@@ -241,6 +241,6 @@ class Ploing {
 	}
 	
 	private function mouseMove(x: Int, y: Int, movementX: Int, movementY: Int): Void {
-		pad1_y = y / System.pixelHeight * backbuffer.height - PAD_HEIGHT / 2;
+		pad1_y = y / System.windowHeight() * backbuffer.height - PAD_HEIGHT / 2;
 	}
 }
